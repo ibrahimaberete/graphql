@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model classes {
+  id                     Int                      @id @default(autoincrement())
+  name                   String                   @db.VarChar(255)
+  promotion              Int
+  trainingid             Int
+  training               training                 @relation(fields: [trainingid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKclasses736275")
+  reserver_salle_classes reserver_salle_classes[]
+  studiant               studiant[]
+
+  @@index([trainingid], map: "FKclasses736275")
+}
+
+model course {
+  id          Int       @id @default(autoincrement())
+  intitule    String    @unique(map: "intitule") @db.VarChar(255)
+  description String    @db.VarChar(255)
+  contenu     String    @db.VarChar(255)
+  materialsid Int
+  trainersid  Int
+  materials   materials @relation(fields: [materialsid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKcourse200295")
+  trainers    trainers  @relation(fields: [trainersid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKcourse905291")
+
+  @@index([materialsid], map: "FKcourse200295")
+  @@index([trainersid], map: "FKcourse905291")
+}
+
+model exams {
+  id             Int              @id @default(autoincrement())
+  date           DateTime         @db.Date
+  temps          Int
+  contenu        String           @db.VarChar(255)
+  materialsid    Int
+  trainersid     Int
+  trainers       trainers         @relation(fields: [trainersid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKexams327578")
+  materials      materials        @relation(fields: [materialsid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKexams622581")
+  studiant_exams studiant_exams[]
+
+  @@index([trainersid], map: "FKexams327578")
+  @@index([materialsid], map: "FKexams622581")
+}
+
+model materials {
+  id                 Int                  @id @default(autoincrement())
+  intitule           String               @unique(map: "intitule") @db.VarChar(255)
+  description        String               @db.VarChar(255)
+  objectifs          String               @db.VarChar(255)
+  prerequis          String               @db.VarChar(255)
+  temps              Int
+  course             course[]
+  exams              exams[]
+  materials_training materials_training[]
+}
+
+model materials_training {
+  materialsid Int
+  trainingid  Int
+  materials   materials @relation(fields: [materialsid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKmaterials_p697703")
+  training    training  @relation(fields: [trainingid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKmaterials_p864207")
+
+  @@id([materialsid, trainingid])
+  @@index([trainingid], map: "FKmaterials_p864207")
+}
+
+model reserver_salle_classes {
+  salle_classesid Int
+  classesid       Int
+  date            DateTime      @db.Date
+  heure_debut     Int
+  heure_fin       Int
+  classes         classes       @relation(fields: [classesid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKreserver_s256587")
+  salle_classes   salle_classes @relation(fields: [salle_classesid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKreserver_s458962")
+
+  @@id([salle_classesid, classesid])
+  @@index([classesid], map: "FKreserver_s256587")
+}
+
+model salle_classes {
+  id                     Int                      @id @default(autoincrement())
+  nom                    String                   @unique(map: "nom") @db.VarChar(255)
+  taille                 Int
+  est_disponible         Boolean
+  reserver_salle_classes reserver_salle_classes[]
+}
+
+model studiant {
+  id             Int              @id @default(autoincrement())
+  num_etudiant   Int              @unique(map: "num_etudiant")
+  nom            String           @db.VarChar(255)
+  prenom         String           @db.VarChar(255)
+  date_naissance DateTime         @db.Date
+  email          String           @unique(map: "email") @db.VarChar(255)
+  mot_de_passe   String           @db.VarChar(255)
+  classesid      Int
+  classes        classes          @relation(fields: [classesid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKstudiant119936")
+  studiant_exams studiant_exams[]
+
+  @@index([classesid], map: "FKstudiant119936")
+}
+
+model studiant_exams {
+  studiantid Int
+  examsid    Int
+  note       Int
+  exams      exams    @relation(fields: [examsid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKstudiant_con197016")
+  studiant   studiant @relation(fields: [studiantid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKstudiant_con587555")
+
+  @@id([studiantid, examsid])
+  @@index([examsid], map: "FKstudiant_con197016")
+}
+
+model trainers {
+  id           Int      @id @default(autoincrement())
+  num_trainer  Int      @unique(map: "num_trainer")
+  nom          String   @db.VarChar(255)
+  prenom       String   @db.VarChar(255)
+  email        String   @unique(map: "email") @db.VarChar(255)
+  mot_de_passe String   @db.VarChar(255)
+  cv           String?  @db.VarChar(255)
+  course       course[]
+  exams        exams[]
+}
+
+model training {
+  id                 Int                  @id @default(autoincrement())
+  intitule           String               @unique(map: "intitule") @db.VarChar(255)
+  description        String               @db.VarChar(255)
+  objectifs          String               @db.VarChar(255)
+  deboucher          String               @db.VarChar(255)
+  classes            classes[]
+  materials_training materials_training[]
+}

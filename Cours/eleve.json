@@ -1,0 +1,22 @@
+{
+    "eleves" : [
+        {
+            "id": 0,
+            "lastname" : "Bissor",
+            "firstname" : "Melvin",
+            "classe" : "X-BAC-CS-1"
+        },
+        {
+            "id": 1,
+            "lastname" : "Ouaki",
+            "firstname" : "Valentin",
+            "classe" : "X-BAC-DEV-3"
+        },
+        {
+            "id": 2,
+            "lastname" : "Achache",
+            "firstname" : "Dan",
+            "classe" : "X-BAC-DEV-3"
+        }
+    ]
+}

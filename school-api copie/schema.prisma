@@ -1,0 +1,107 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Define the data model for the school's courses
+model Course {
+  id            Int        @id @default(autoincrement())
+  name          String
+  code          String     @unique
+  description   String?
+  start_date    DateTime?
+  end_date      DateTime?
+  department    Department @relation("DepartmentCourses", fields: [department_id], references: [id])
+  department_id Int
+  classes       Class[]    @relation("course_classes")
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+}
+
+// Define the data model for the school's departments
+model Department {
+  id         Int       @id @default(autoincrement())
+  name       String
+  addressId  Int?
+  address    Address?  @relation(fields: [addressId], references: [id])
+  courses    Course[]  @relation("DepartmentCourses")
+  trainers   Trainer[] @relation("DepartmentTrainers")
+  created_at DateTime  @default(now())
+}
+
+// Define the data model for the school's student classes
+model Class {
+  id          Int       @id @default(autoincrement())
+  name        String
+  code        String    @unique
+  description String?
+  start_date  DateTime?
+  end_date    DateTime?
+  course      Course    @relation("course_classes", fields: [course_id], references: [id])
+  course_id   Int
+  students    Student[] @relation("student_classes")
+  grades      Grade[]   @relation("class_grades")
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+}
+
+// Define the data model for the school's students
+model Student {
+  id         Int      @id @default(autoincrement())
+  first_name String
+  last_name  String
+  email      String?
+  phone      String?
+  website    String?
+  address    Address? @relation(fields: [address_id], references: [id])
+  address_id Int?
+  classes    Class[]  @relation("student_classes")
+  grades     Grade[]  @relation("student_grades")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+// Define the data model for the school's trainers
+model Trainer {
+  id            Int        @id @default(autoincrement())
+  first_name    String
+  last_name     String
+  email         String?
+  phone         String?
+  website       String?
+  department    Department @relation("DepartmentTrainers", fields: [department_id], references: [id])
+  department_id Int
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+}
+
+// Define the data model for the school's grades
+model Grade {
+  id          Int      @id @default(autoincrement())
+  value       Float
+  description String?
+  student     Student  @relation("student_grades", fields: [student_id], references: [id])
+  student_id  Int
+  class       Class    @relation("class_grades", fields: [class_id], references: [id])
+  class_id    Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+// Define the data model for the school's addresses
+model Address {
+  id         Int          @id @default(autoincrement())
+  street     String
+  city       String
+  state      String
+  zip_code   String
+  country    String
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  Department Department[]
+  Student    Student[]
+}

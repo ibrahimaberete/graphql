@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model classes {
+  id                     Int                      @id @default(autoincrement())
+  nom                    String                   @db.VarChar(255)
+  promotion              Int
+  parcoursid             Int
+  parcours               parcours                 @relation(fields: [parcoursid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKclasses736275")
+  eleves                 eleves[]
+  reserver_salle_classes reserver_salle_classes[]
+
+  @@index([parcoursid], map: "FKclasses736275")
+}
+
+model controlles {
+  id                Int                 @id @default(autoincrement())
+  date              DateTime            @db.Date
+  temps             Int
+  contenu           String              @db.VarChar(255)
+  matieresid        Int
+  formateursid      Int
+  formateurs        formateurs          @relation(fields: [formateursid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKcontrolles327578")
+  matieres          matieres            @relation(fields: [matieresid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKcontrolles622581")
+  eleves_controlles eleves_controlles[]
+
+  @@index([formateursid], map: "FKcontrolles327578")
+  @@index([matieresid], map: "FKcontrolles622581")
+}
+
+model cours {
+  id           Int        @id @default(autoincrement())
+  intitule     String     @unique(map: "intitule") @db.VarChar(255)
+  description  String     @db.VarChar(255)
+  contenu      String     @db.VarChar(255)
+  matieresid   Int
+  formateursid Int
+  matieres     matieres   @relation(fields: [matieresid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKcours200295")
+  formateurs   formateurs @relation(fields: [formateursid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKcours905291")
+
+  @@index([matieresid], map: "FKcours200295")
+  @@index([formateursid], map: "FKcours905291")
+}
+
+model eleves {
+  id                Int                 @id @default(autoincrement())
+  num_etudiant      Int                 @unique(map: "num_etudiant")
+  nom               String              @db.VarChar(255)
+  prenom            String              @db.VarChar(255)
+  date_naissance    DateTime            @db.Date
+  email             String              @unique(map: "email") @db.VarChar(255)
+  mot_de_passe      String              @db.VarChar(255)
+  classesid         Int
+  classes           classes             @relation(fields: [classesid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKeleves119936")
+  eleves_controlles eleves_controlles[]
+
+  @@index([classesid], map: "FKeleves119936")
+}
+
+model eleves_controlles {
+  elevesid     Int
+  controllesid Int
+  note         Int
+  controlles   controlles @relation(fields: [controllesid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKeleves_con197016")
+  eleves       eleves     @relation(fields: [elevesid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKeleves_con587555")
+
+  @@id([elevesid, controllesid])
+  @@index([controllesid], map: "FKeleves_con197016")
+}
+
+model formateurs {
+  id            Int          @id @default(autoincrement())
+  num_formateur Int          @unique(map: "num_formateur")
+  nom           String       @db.VarChar(255)
+  prenom        String       @db.VarChar(255)
+  email         String       @unique(map: "email") @db.VarChar(255)
+  mot_de_passe  String       @db.VarChar(255)
+  cv            String?      @db.VarChar(255)
+  controlles    controlles[]
+  cours         cours[]
+}
+
+model matieres {
+  id                Int                 @id @default(autoincrement())
+  intitule          String              @unique(map: "intitule") @db.VarChar(255)
+  description       String              @db.VarChar(255)
+  objectifs         String              @db.VarChar(255)
+  prerequis         String              @db.VarChar(255)
+  temps             Int
+  controlles        controlles[]
+  cours             cours[]
+  matieres_parcours matieres_parcours[]
+}
+
+model matieres_parcours {
+  matieresid Int
+  parcoursid Int
+  matieres   matieres @relation(fields: [matieresid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKmatieres_p697703")
+  parcours   parcours @relation(fields: [parcoursid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKmatieres_p864207")
+
+  @@id([matieresid, parcoursid])
+  @@index([parcoursid], map: "FKmatieres_p864207")
+}
+
+model parcours {
+  id                Int                 @id @default(autoincrement())
+  intitule          String              @unique(map: "intitule") @db.VarChar(255)
+  description       String              @db.VarChar(255)
+  objectifs         String              @db.VarChar(255)
+  deboucher         String              @db.VarChar(255)
+  classes           classes[]
+  matieres_parcours matieres_parcours[]
+}
+
+model reserver_salle_classes {
+  salle_classesid Int
+  classesid       Int
+  date            DateTime      @db.Date
+  heure_debut     Int
+  heure_fin       Int
+  classes         classes       @relation(fields: [classesid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKreserver_s256587")
+  salle_classes   salle_classes @relation(fields: [salle_classesid], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FKreserver_s458962")
+
+  @@id([salle_classesid, classesid])
+  @@index([classesid], map: "FKreserver_s256587")
+}
+
+model salle_classes {
+  id                     Int                      @id @default(autoincrement())
+  nom                    String                   @unique(map: "nom") @db.VarChar(255)
+  taille                 Int
+  est_disponible         Boolean
+  reserver_salle_classes reserver_salle_classes[]
+}

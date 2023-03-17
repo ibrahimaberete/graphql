@@ -1,0 +1,49 @@
+{
+    "eleves" : [
+        {
+            "id": 0,
+            "lastname" : "Bissor",
+            "firstname" : "Melvin",
+            "classe" : 2
+        },
+        {
+            "id": 1,
+            "lastname" : "Ouaki",
+            "firstname" : "Valentin",
+            "classe" : 1
+        },
+        {
+            "id": 2,
+            "lastname" : "Achache",
+            "firstname" : "Dan",
+            "classe" : 1
+        }
+    ],
+    "classe" : [
+        {
+            "id": 0,
+            "name": "X-MAS-DEV-4",
+            "groupe" : 2,
+            "promo" : "2022/2023"
+        },
+        {
+            "id": 1,
+            "name": "X-MAS-DEV-4",
+            "groupe" : 3,
+            "promo" : "2022/2023"
+        },
+        {
+            "id": 2,
+            "name": "X-MAS-DEV-4",
+            "groupe" : 1,
+            "promo" : "2022/2023"
+        },
+        {
+            "id": 3,
+            "name": "X-BAC-DEV-3",
+            "groupe" : 1,
+            "promo" : "2022/2023"
+        }
+    ]
+
+}
